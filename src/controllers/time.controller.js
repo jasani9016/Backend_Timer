@@ -14,7 +14,8 @@ const createTimeManagment = {
       // startTime: Joi.string(),
     }),
   },
-  handler: catchAsync(async (req, res) => {
+  handler: async (req, res) => {
+
     const body = {
       ...req.body,
       startTime: new Date(),
@@ -22,14 +23,14 @@ const createTimeManagment = {
     }
 
     const result = await new Time(body).save();
-
-    return res.status(httpStatus.CREATED).send({ message: 'Task Added successfully', result });
-  })
+    return res.status(httpStatus.CREATED).send(result);
+    // return res.status(httpStatus.CREATED).send(result);
+  }
 }
 
 const getTimeManagment = catchAsync(async (req, res) => {
   const result = await Time.find({
-    user : req.user.id
+    user: req.user.id
   });
   return res.status(httpStatus.OK).send({ result });
 });
