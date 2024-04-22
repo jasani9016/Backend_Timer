@@ -12,6 +12,9 @@ const userSchema = mongoose.Schema(
     lastName: {
       type: String,
     },
+    address:{
+      type:String,
+    },
     contactNo: {
       type: String,
     },
@@ -79,7 +82,7 @@ const userSchema = mongoose.Schema(
     companyName: {
       type: String,
     },
-    companyNameAddress: {
+    companyAddress: {
       type: String,
     },
     stafId: {

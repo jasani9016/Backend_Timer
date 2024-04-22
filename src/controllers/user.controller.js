@@ -112,6 +112,8 @@ const getBankDetails = {
   }
 }
 
+//Company Deatils
+
 const updateCompanyDetails = {
   validation: {
     body: Joi.object().keys({
