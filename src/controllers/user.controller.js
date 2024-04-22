@@ -65,8 +65,9 @@ const updateProfile = {
       req.body.profileImage = upload_path;
     }
 
-    const user = await userService.updateUserById(req.user._id, req.body)
-    return res.status(httpStatus.OK).send({ message: "Profile Update Successfully", user });
+    const user = await userService.updateUserById(req.user.id, req.body)
+    // return res.status(httpStatus.OK).send({ message: "Profile Update Successfully", user });
+    return res.send(user);
   }
 }
 

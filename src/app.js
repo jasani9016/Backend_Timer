@@ -14,6 +14,8 @@ const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const uploader = require('express-fileupload');
+const path = require('path');
+
 
 const app = express();
 
@@ -42,8 +44,15 @@ app.use(compression());
 app.use(cors());
 app.options('*', cors());
 
+// jwt authentication
+app.use(passport.initialize());
+passport.use('jwt', jwtStrategy);
+
 
 // enable files upload
+
+app.use(express.static(path.resolve("./public")));
+app.use(express.static(path.resolve("./images")));
 app.use(uploader({
   safeFileNames: true,
   preserveExtension: true,
@@ -53,17 +62,17 @@ app.use(uploader({
   abortOnLimit: true,
   responseOnLimit: 'File size limit has been reached',
   httpErrorCode: 400,
-  uploadDir: './uploads',
-  uploadUrl: '/uploads',
+  // uploadDir: './uploads',
+  // uploadUrl: '/uploads',
+  // useDateFolder: true,
   useDateFolder: true,
+  createParentPath: true
 }));
 
-app.use('/uploads', express.static('uploads'));
+// app.use('/uploads', express.static('uploads'));
 
 
-// jwt authentication
-app.use(passport.initialize());
-passport.use('jwt', jwtStrategy);
+
 
 // limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
