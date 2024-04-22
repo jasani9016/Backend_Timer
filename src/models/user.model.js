@@ -12,14 +12,11 @@ const userSchema = mongoose.Schema(
     lastName: {
       type: String,
     },
-    address: {
-      type: String,
-    },
     contactNo: {
       type: String,
     },
     birthDate: {
-      type: Date,
+      type: String,
     },
     gender: {
       type: String,
@@ -50,6 +47,43 @@ const userSchema = mongoose.Schema(
         }
       },
       private: true, // used by the toJSON plugin
+    },
+
+    bankName: {
+      type: String,
+    },
+    branchName: {
+      type: String,
+    },
+    branchNumber: {
+      type: String,
+    },
+    streetAddress: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    zipCode: {
+      type: String,
+    },
+    region: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
+    bankAccounType: {
+      type: String,
+    },
+    companyName: {
+      type: String,
+    },
+    companyNameAddress: {
+      type: String,
+    },
+    stafId: {
+      type: String,
     },
     role: {
       type: String,

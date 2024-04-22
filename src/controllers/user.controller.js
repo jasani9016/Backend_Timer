@@ -45,6 +45,8 @@ const getAllUser = {
   }
 }
 
+//Profile Update
+
 const updateProfile = {
   validation: {
     body: Joi.object().keys({
@@ -52,7 +54,7 @@ const updateProfile = {
       lastName: Joi.string(),
       address: Joi.string(),
       contactNo: Joi.string(),
-      birthDate: Joi.date(),
+      birthDate: Joi.string(),
       gender: Joi.string(),
       email: Joi.string(),
       profileImage: Joi.string(),
@@ -73,8 +75,68 @@ const updateProfile = {
 
 const getProfile = {
   handler: async (req, res) => {
-    const user = await userService.getUserById(req.user._id);
+    const user = await userService.getUserById(req.user.id);
     return res.send(user);
+  }
+}
+
+// Bank details
+
+const updateBankDetails = {
+  validation: {
+    body: Joi.object().keys({
+      bankName: Joi.string(),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      branchNumber: Joi.string(),
+      branchName: Joi.string(),
+      streetAddress: Joi.string(),
+      city: Joi.string(),
+      zipCode: Joi.string(),
+      region: Joi.string(),
+      country: Joi.string(),
+      bankAccounType: Joi.string(),
+    })
+  },
+  handler: async (req, res) => {
+    const user = await userService.updateUserById(req.user.id, req.body)
+    return res.status(httpStatus.OK).send({ message: "Bank Details Update Successfully", user });
+  }
+}
+
+const getBankDetails = {
+  handler: async (req, res) => {
+    const user = await userService.getUserById(req.user.id);
+    return res.status(httpStatus.OK).send(user);
+
+  }
+}
+
+const updateCompanyDetails = {
+  validation: {
+    body: Joi.object().keys({
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      companyName: Joi.string(),
+      companyAddress: Joi.string(),
+      stafId: Joi.string(),
+      email: Joi.string(),
+      country: Joi.string(),
+      city: Joi.string(),
+      zipCode: Joi.string(),
+      contactNo: Joi.string(),
+    })
+  },
+  handler: async (req, res) => { 
+    const user = await userService.updateUserById(req.user.id,req.body);
+    return res.status(httpStatus.OK).send(user);
+  }
+}
+
+const getCompanyDetails={
+  handler:async(req,res)=>{
+    const user=await userService.getUserById(req.user.id);
+    return res.status(httpStatus.OK).send(user);
   }
 }
 
@@ -86,9 +148,12 @@ module.exports = {
   deleteUser,
   getAllUser,
   updateProfile,
-  getProfile
+  getProfile,
+  updateBankDetails,
+  getBankDetails,
+  updateCompanyDetails,
+  getCompanyDetails
 };
 
 
 
- 

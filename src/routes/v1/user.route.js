@@ -13,8 +13,15 @@ router
   .get(auth('getUsers'), validate(userValidation.getUsers), userController.getUsers);
   
  router.get('/getAllUser',auth(),catchAsync(userController.getAllUser.handler));
-router.put('/updateProfile',auth(),catchAsync(userController.updateProfile.handler));
-router.get('/getProfile',auth(),catchAsync(userController.getProfile.handler));
+router.put('/updateProfile',auth(),validate(userController.updateProfile.validation),catchAsync(userController.updateProfile.handler)); // update personal details 
+router.get('/getProfile',auth(),catchAsync(userController.getProfile.handler));   //get personal details
+
+router.put('/updateBankDetails',auth(),validate(userController.updateBankDetails.validation),catchAsync(userController.updateBankDetails.handler));   // update bank details
+router.get('/getBankDetails',auth(),catchAsync(userController.getBankDetails.handler));   //get bank details
+
+router.put('/updateCompanyDetails',auth(),validate(userController.updateCompanyDetails.validation),catchAsync(userController.updateCompanyDetails.handler));   // update bank details
+router.get('/getCompanyDetails',auth(),catchAsync(userController.getCompanyDetails.handler));   //get bank details
+
 router
   .route('/:userId')
   .get(auth('getUsers'), validate(userValidation.getUser), userController.getUser)
