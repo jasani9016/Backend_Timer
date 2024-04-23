@@ -15,24 +15,41 @@ const createTimeManagment = {
     }),
   },
   handler: async (req, res) => {
+    const startTime = new Date();
+    // const endTime = new Date(Date.now() + 6 * 6 * 100);
 
     const body = {
       ...req.body,
-      startTime: new Date(),
+      startTime,
+      // endTime,
       user: req.user.id
     }
 
     const result = await new Time(body).save();
     return res.status(httpStatus.CREATED).send(result);
-    // return res.status(httpStatus.CREATED).send(result);
   }
 }
 
+// const getTimeManagment = catchAsync(async (req, res) => {
+//   const result = await Time.find({
+//     user: req.user.id
+//   });
+//   return res.status(httpStatus.OK).send({ result });
+// });
+
 const getTimeManagment = catchAsync(async (req, res) => {
-  const result = await Time.find({
-    user: req.user.id
-  });
-  return res.status(httpStatus.OK).send({ result });
+  const results = await Time.find({ user: req.user.id });
+
+
+  // const timeResults = results.map(result => {
+  //   const startTime = new Date(result.startTime);
+  //   const endTime = new Date(result.endTime || Date.now());
+  //   const timeDifference = endTime - startTime;
+  //   const totalTime = timeDifference / (1000 * 60); // Convert milliseconds to minutes
+  //   return { ...result.toJSON(), totalTime };
+  // });
+
+  return res.status(httpStatus.OK).send({ results });
 });
 
 
@@ -48,9 +65,23 @@ const updateTimeManagment = {
       throw new ApiError(httpStatus.NOT_FOUND, 'not found');
     }
 
-    const result = await Time.findByIdAndUpdate(req.params.id, { endTime: new Date() }, { new: true });
+    const formateTime = () => {
+      const endTime = new Date();
+      const startTime = new Date(festivals.startTime);
+      const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000); // Convert milliseconds to seconds
+      const hours = Math.floor(elapsedTimeInSeconds / 3600);
+      const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
+      const seconds = elapsedTimeInSeconds % 60;
+      return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+    }
+    festivals.endTime = endTime;
+    festivals.elapsedTime = elapsedTimeInSeconds;
+    // console.log('formateTime', formateTime)
+    // Update the end time and elapsed time
 
-    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result });
+    const result = await festivals.save();
+
+    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result,formateTime });
   })
 }
 
@@ -60,5 +91,4 @@ module.exports = {
   createTimeManagment,
   getTimeManagment,
   updateTimeManagment
-  // updateFestivalsFrame
 };
