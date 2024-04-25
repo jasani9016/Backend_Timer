@@ -40,15 +40,6 @@ const createTimeManagment = {
 const getTimeManagment = catchAsync(async (req, res) => {
   const results = await Time.find({ user: req.user.id });
 
-
-  // const timeResults = results.map(result => {
-  //   const startTime = new Date(result.startTime);
-  //   const endTime = new Date(result.endTime || Date.now());
-  //   const timeDifference = endTime - startTime;
-  //   const totalTime = timeDifference / (1000 * 60); // Convert milliseconds to minutes
-  //   return { ...result.toJSON(), totalTime };
-  // });
-
   return res.status(httpStatus.OK).send({ results });
 });
 
@@ -64,28 +55,36 @@ const updateTimeManagment = {
     if (!festivals) {
       throw new ApiError(httpStatus.NOT_FOUND, 'not found');
     }
-
-    const formateTime = () => {
-      const endTime = new Date();
-      const startTime = new Date(festivals.startTime);
-      const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000); // Convert milliseconds to seconds
-      const hours = Math.floor(elapsedTimeInSeconds / 3600);
-      const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
-      const seconds = elapsedTimeInSeconds % 60;
-      return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
-    }
+    const endTime = new Date();
+    const startTime = new Date(festivals.startTime);
+    const formatedTime = formateTime(endTime, startTime);
+    console.log('formatedTime', formatedTime)
     festivals.endTime = endTime;
-    festivals.elapsedTime = elapsedTimeInSeconds;
+    festivals.elapsedTime = formatedTime;
     // console.log('formateTime', formateTime)
     // Update the end time and elapsed time
 
     const result = await festivals.save();
 
-    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result,formateTime });
+    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result, formateTime });
   })
 }
 
+const formateTime = (endTime, startTime) => {
 
+
+  const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000); // Convert milliseconds to seconds
+  const hours = Math.floor(elapsedTimeInSeconds / 3600);
+  const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
+  const seconds = elapsedTimeInSeconds % 60;
+  return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+}
+
+const padZero = (num) => {
+  // return num.toString().padStart(2, '0');
+  return num < 10 ? `0${num}` : num;
+
+};
 
 module.exports = {
   createTimeManagment,
