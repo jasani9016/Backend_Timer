@@ -131,7 +131,7 @@ const updateCompanyDetails = {
   },
   handler: async (req, res) => { 
     const user = await userService.updateUserById(req.user.id,req.body);
-    return res.status(httpStatus.OK).send(user);
+    return res.status(httpStatus.OK).send({message:"Update Successfully",user});
   }
 }
 

@@ -4,6 +4,7 @@ const catchAsync = require('../utils/catchAsync');
 const Joi = require('joi');
 // const { saveFile } = require('../utils/helper');
 const { Time } = require('../models');
+const { ObjectId } = require('mongodb');
 
 
 const createTimeManagment = {
@@ -30,19 +31,31 @@ const createTimeManagment = {
   }
 }
 
-// const getTimeManagment = catchAsync(async (req, res) => {
-//   const result = await Time.find({
-//     user: req.user.id
-//   });
-//   return res.status(httpStatus.OK).send({ result });
-// });
 
 const getTimeManagment = catchAsync(async (req, res) => {
-  const results = await Time.find({ user: req.user.id });
+  const { startDate, endDate } = req.query;
+  let results;
+
+  if (startDate && endDate) {
+    results = await Time.aggregate(
+      [
+        {
+          $match: {
+            user: ObjectId(req.user.id),
+            createdAt: {
+              $gte: new Date(startDate),
+              $lt: new Date(endDate)
+            }
+          }
+        }
+      ],
+    );
+  } else {
+    results = await Time.find({ user: req.user.id });
+  }
 
   return res.status(httpStatus.OK).send({ results });
 });
-
 
 const updateTimeManagment = {
   validation: {

@@ -28,9 +28,9 @@ const timeSchema = mongoose.Schema(
     elapsedTime: {
       type: String,
     },
-    createdAtDate: {
+    createdAt: { 
       type: String,
-    },
+    }
   },
   {
     timestamps: true,
