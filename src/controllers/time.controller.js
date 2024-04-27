@@ -5,6 +5,7 @@ const Joi = require('joi');
 // const { saveFile } = require('../utils/helper');
 const { Time } = require('../models');
 const { ObjectId } = require('mongodb');
+const { objectId } = require('../validations/custom.validation');
 
 
 const createTimeManagment = {
@@ -57,6 +58,36 @@ const getTimeManagment = catchAsync(async (req, res) => {
   return res.status(httpStatus.OK).send({ results });
 });
 
+// const getAllTimeManagement = catchAsync(async (req, res) => {
+//   const time = await Time.find();
+//   return res.status(httpStatus.OK).send({ time });
+
+// })
+
+const getAllTimeManagement = catchAsync(async (req, res) => {
+  const { startDate, endDate } = req.query;
+  let time;
+
+  if (startDate && endDate) {
+    time = await Time.aggregate(
+      [
+        {
+          $match: {
+            createdAt: {
+              $gte: new Date(startDate),
+              $lt: new Date(endDate)
+            }
+          }
+        }
+      ],
+    );
+  } else {
+    time = await Time.find();
+  }
+
+  return res.status(httpStatus.OK).send({ time });
+});
+
 const updateTimeManagment = {
   validation: {
     params: Joi.object().keys({
@@ -71,7 +102,6 @@ const updateTimeManagment = {
     const endTime = new Date();
     const startTime = new Date(festivals.startTime);
     const formatedTime = formateTime(endTime, startTime);
-    console.log('formatedTime', formatedTime)
     festivals.endTime = endTime;
     festivals.elapsedTime = formatedTime;
     // console.log('formateTime', formateTime)
@@ -86,10 +116,15 @@ const updateTimeManagment = {
 const formateTime = (endTime, startTime) => {
 
 
-  const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000); // Convert milliseconds to seconds
+  const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000);
   const hours = Math.floor(elapsedTimeInSeconds / 3600);
   const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
   const seconds = elapsedTimeInSeconds % 60;
+  // const sum = [1,5,6].reduce(add, 0);
+  // function add(t1, t2) {
+  //   return t1 + t2
+  // }
+  // console.log('sum', sum)
   return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
 }
 
@@ -102,5 +137,6 @@ const padZero = (num) => {
 module.exports = {
   createTimeManagment,
   getTimeManagment,
-  updateTimeManagment
+  updateTimeManagment,
+  getAllTimeManagement
 };

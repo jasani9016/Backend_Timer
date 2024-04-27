@@ -28,6 +28,9 @@ const timeSchema = mongoose.Schema(
     elapsedTime: {
       type: String,
     },
+    elapsedTotalTime: {
+      type: String,
+    },
     createdAt: { 
       type: String,
     }
