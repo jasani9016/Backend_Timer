@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/create',auth(), validate(timeController.createTimeManagment.validation), catchAsync(timeController.createTimeManagment.handler));
 router.put('/update/:id',auth(), validate(timeController.updateTimeManagment.validation), catchAsync(timeController.updateTimeManagment.handler));
 router.get('/get', auth(), catchAsync(timeController.getTimeManagment));
+router.get('/getAllTime',  catchAsync(timeController.getAllTimeManagement));
 // router.put('/:_id', auth(), validate(festivalsFrameController.updateFestivalsFrame.validation), catchAsync(festivalsFrameController.updateFestivalsFrame.handler));
 
 

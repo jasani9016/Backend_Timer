@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 const { tokenTypes } = require('../config/tokens');
+const { date } = require('joi');
 
 const timeSchema = mongoose.Schema(
   {
-  
+
     user: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'User',
@@ -18,12 +19,21 @@ const timeSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    startTime:{
+    startTime: {
       type: Date,
     },
-    endTime:{
+    endTime: {
       type: Date,
     },
+    elapsedTime: {
+      type: String,
+    },
+    elapsedTotalTime: {
+      type: String,
+    },
+    createdAt: { 
+      type: String,
+    }
   },
   {
     timestamps: true,
