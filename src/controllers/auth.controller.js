@@ -11,7 +11,8 @@ const register = {
     body: Joi.object().keys({
       name: Joi.string().required(),
       email: Joi.string().required().email(),
-      password: Joi.string().required().custom(password),
+      // password: Joi.string().required().custom(password),
+      password: Joi.string().required(),
     }),
   },
   handler: async (req, res) => {
