@@ -14,7 +14,7 @@ const createTimeManagment = {
     body: Joi.object().keys({
       projectName: Joi.string().required(),
       taskTitle: Joi.string().required(),
-      // startTime: Joi.string(),
+      startTime : Joi.date().required(),
     }),
   },
   handler: async (req, res) => {
@@ -22,7 +22,6 @@ const createTimeManagment = {
 
     const body = {
       ...req.body,
-      startTime: new Date(),
       user: req.user.id
     }
 
@@ -87,10 +86,17 @@ const getAllTimeManagement = catchAsync(async (req, res) => {
   return res.status(httpStatus.OK).send({ time });
 });
 
+const padZero = (num) => {
+  return num.toString().padStart(2, '0');
+};
+
 const updateTimeManagment = {
   validation: {
     params: Joi.object().keys({
       id: Joi.string(),
+    }),
+    body: Joi.object().keys({
+      endTime: Joi.string(),
     }),
   },
   handler: catchAsync(async (req, res) => {
@@ -99,8 +105,10 @@ const updateTimeManagment = {
       throw new ApiError(httpStatus.NOT_FOUND, 'not found');
     }
 
+    const { endTime : endTimeDate } = req.body;
+
     const startTime = moment(timeData.startTime);
-    const endTime = moment(new Date());
+    const endTime = moment(endTimeDate);
 
     const duration = moment.duration(endTime.diff(startTime));
 
@@ -108,7 +116,7 @@ const updateTimeManagment = {
     const minutes = duration.minutes();
     const seconds = duration.seconds();
 
-    const elapsedTime = `${hours}:${minutes}:${seconds}`;
+    const elapsedTime = `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
 
     timeData.elapsedTime = elapsedTime;
     timeData.endTime = endTime;
