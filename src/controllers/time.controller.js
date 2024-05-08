@@ -6,6 +6,7 @@ const Joi = require('joi');
 const { Time } = require('../models');
 const { ObjectId } = require('mongodb');
 const { objectId } = require('../validations/custom.validation');
+const moment = require('moment');
 
 
 const createTimeManagment = {
@@ -17,13 +18,11 @@ const createTimeManagment = {
     }),
   },
   handler: async (req, res) => {
-    const startTime = new Date();
     // const endTime = new Date(Date.now() + 6 * 6 * 100);
 
     const body = {
       ...req.body,
-      startTime,
-      // endTime,
+      startTime: new Date(),
       user: req.user.id
     }
 
@@ -95,44 +94,31 @@ const updateTimeManagment = {
     }),
   },
   handler: catchAsync(async (req, res) => {
-    const festivals = await Time.findById(req.params.id);
-    if (!festivals) {
+    const timeData = await Time.findById(req.params.id);
+    if (!timeData) {
       throw new ApiError(httpStatus.NOT_FOUND, 'not found');
     }
-    const endTime = new Date();
-    const startTime = new Date(festivals.startTime);
-    const formatedTime = formateTime(endTime, startTime);
-    festivals.endTime = endTime;
-    festivals.elapsedTime = formatedTime;
-    // console.log('formateTime', formateTime)
-    // Update the end time and elapsed time
 
-    const result = await festivals.save();
+    const startTime = moment(timeData.startTime);
+    const endTime = moment(new Date());
 
-    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result, formateTime });
+    const duration = moment.duration(endTime.diff(startTime));
+
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
+
+    const elapsedTime = `${hours}:${minutes}:${seconds}`;
+
+    timeData.elapsedTime = elapsedTime;
+    timeData.endTime = endTime;
+
+    const result = await timeData.save();
+
+    return res.status(httpStatus.OK).send({ message: 'Record updated successfully', result });
   })
 }
 
-const formateTime = (endTime, startTime) => {
-
-
-  const elapsedTimeInSeconds = Math.floor((endTime - startTime) / 1000);
-  const hours = Math.floor(elapsedTimeInSeconds / 3600);
-  const minutes = Math.floor((elapsedTimeInSeconds % 3600) / 60);
-  const seconds = elapsedTimeInSeconds % 60;
-  // const sum = [1,5,6].reduce(add, 0);
-  // function add(t1, t2) {
-  //   return t1 + t2
-  // }
-  // console.log('sum', sum)
-  return `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
-}
-
-const padZero = (num) => {
-  // return num.toString().padStart(2, '0');
-  return num < 10 ? `0${num}` : num;
-
-};
 
 module.exports = {
   createTimeManagment,
