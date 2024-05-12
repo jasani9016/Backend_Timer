@@ -14,7 +14,7 @@ const createTimeManagment = {
     body: Joi.object().keys({
       projectName: Joi.string().required(),
       taskTitle: Joi.string().required(),
-      startTime : Joi.date().required(),
+      startTime: Joi.date().required(),
     }),
   },
   handler: async (req, res) => {
@@ -46,11 +46,16 @@ const getTimeManagment = catchAsync(async (req, res) => {
               $lt: new Date(endDate)
             }
           }
+        },
+        {
+          $sort: {
+            createdAt: -1
+          }
         }
       ],
     );
   } else {
-    results = await Time.find({ user: req.user.id });
+    results = await Time.find({ user: req.user.id }).sort({ createdAt: -1 });
   }
 
   return res.status(httpStatus.OK).send({ results });
@@ -105,7 +110,7 @@ const updateTimeManagment = {
       throw new ApiError(httpStatus.NOT_FOUND, 'not found');
     }
 
-    const { endTime : endTimeDate } = req.body;
+    const { endTime: endTimeDate } = req.body;
 
     const startTime = moment(timeData.startTime);
     const endTime = moment(endTimeDate);
