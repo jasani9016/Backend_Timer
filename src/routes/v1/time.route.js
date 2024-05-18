@@ -10,6 +10,8 @@ router.post('/create',auth(), validate(timeController.createTimeManagment.valida
 router.put('/update/:id',auth(), validate(timeController.updateTimeManagment.validation), catchAsync(timeController.updateTimeManagment.handler));
 router.get('/get', auth(), catchAsync(timeController.getTimeManagment));
 router.get('/getAllTime',  catchAsync(timeController.getAllTimeManagement));
+router.get('/check-timer-status', auth(), catchAsync(timeController.checkTimerStart));
+router.get('/today-total-time', auth(), catchAsync(timeController.todayTotalCount));
 // router.put('/:_id', auth(), validate(festivalsFrameController.updateFestivalsFrame.validation), catchAsync(festivalsFrameController.updateFestivalsFrame.handler));
 
 
