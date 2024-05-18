@@ -94,7 +94,7 @@ const getAllTimeManagement = catchAsync(async (req, res) => {
 });
 
 const checkTimerStart = catchAsync(async (req, res) => {
-  const time = await Time.findOne({ user: req.user.id, endTime: null });
+  const time = await Time.findOne({ user: req.user.id, endTime: null }).sort({ createdAt: -1 });
   return res.status(httpStatus.OK).send({ result: time });
 });
 
