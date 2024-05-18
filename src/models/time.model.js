@@ -24,6 +24,7 @@ const timeSchema = mongoose.Schema(
     },
     endTime: {
       type: Date,
+      default: null,
     },
     elapsedTime: {
       type: String,
