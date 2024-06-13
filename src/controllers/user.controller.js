@@ -87,7 +87,6 @@ const updateBankDetails = {
     body: Joi.object().keys({
       bankName: Joi.string(),
       firstName: Joi.string(),
-      lastName: Joi.string(),
       branchNumber: Joi.string(),
       branchName: Joi.string(),
       streetAddress: Joi.string(),
@@ -96,6 +95,7 @@ const updateBankDetails = {
       region: Joi.string(),
       country: Joi.string(),
       bankAccounType: Joi.string(),
+      ifscCode: Joi.string(),
     })
   },
   handler: async (req, res) => {

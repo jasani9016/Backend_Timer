@@ -85,6 +85,9 @@ const userSchema = mongoose.Schema(
     companyAddress: {
       type: String,
     },
+    ifscCode: {
+      type: String,
+    },
     stafId: {
       type: String,
     },

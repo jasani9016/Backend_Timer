@@ -41,7 +41,7 @@ const login = {
 
     const user = await User.findOne({ email });
     if (!user || !(await user.isPasswordMatch(password))) {
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Incorrect email or password');
     }
 
     const token = await tokenService.generateAuthTokens(user);
