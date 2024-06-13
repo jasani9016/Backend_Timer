@@ -54,7 +54,7 @@ const updateProfile = {
       lastName: Joi.string(),
       address: Joi.string(),
       contactNo: Joi.string(),
-      birthDate: Joi.string(),
+      birthDate: Joi.date(),
       gender: Joi.string(),
       email: Joi.string(),
       profileImage: Joi.string(),
@@ -129,16 +129,42 @@ const updateCompanyDetails = {
       contactNo: Joi.string(),
     })
   },
-  handler: async (req, res) => { 
-    const user = await userService.updateUserById(req.user.id,req.body);
-    return res.status(httpStatus.OK).send({message:"Update Successfully",user});
+  handler: async (req, res) => {
+    const user = await userService.updateUserById(req.user.id, req.body);
+    return res.status(httpStatus.OK).send({ message: "Update Successfully", user });
   }
 }
 
-const getCompanyDetails={
-  handler:async(req,res)=>{
-    const user=await userService.getUserById(req.user.id);
+const getCompanyDetails = {
+  handler: async (req, res) => {
+    const user = await userService.getUserById(req.user.id);
     return res.status(httpStatus.OK).send(user);
+  }
+}
+
+const upcommingUserBirthdate = {
+  handler: async (req, res) => {
+    const user = await User.find({ role: 'user' }).sort({ birthDate: 1 });
+    return res.status(httpStatus.OK).send({
+      status: 'success',
+      data: user
+    });
+  }
+}
+
+const todayUserBirthdate = {
+  handler: async (req, res) => {
+    const user = await User.find({ 
+      role: 'user',
+      birthDate: {
+        $gte: new Date(new Date().setHours(00, 00, 00)),
+        $lt: new Date(new Date().setHours(23, 59, 59))
+      }
+     })
+    return res.status(httpStatus.OK).send({
+      status: 'success',
+      data: user
+    });
   }
 }
 
@@ -154,7 +180,9 @@ module.exports = {
   updateBankDetails,
   getBankDetails,
   updateCompanyDetails,
-  getCompanyDetails
+  getCompanyDetails,
+  upcommingUserBirthdate,
+  todayUserBirthdate
 };
 
 
