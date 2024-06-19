@@ -9,9 +9,10 @@ const moment = require('moment');
 const createLeave = {
   validation: {
     body: Joi.object().keys({
-      date: Joi.date().required(),
+      startDate: Joi.date().required(),
+      endDate: Joi.date().required(),
       reason: Joi.string().required(),
-      type: Joi.string().valid('full', 'half').required(),
+      leaveType: Joi.string().valid('full', 'half'),
       halfType: Joi.string().when('type', { is: 'half', then: Joi.valid('first', 'second').required() }),
     }),
   },
@@ -22,7 +23,7 @@ const createLeave = {
       user: req.user.id
     }
 
-    const isLeaveOld = moment(body.date).isBefore(moment().startOf('day'));
+    const isLeaveOld = moment(body.startDate).isBefore(moment().startOf('day'));
 
     if (isLeaveOld) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
@@ -61,6 +62,8 @@ const updateLeave = {
   validation: {
     body: Joi.object().keys({
       status: Joi.string().valid('approved', 'rejected').required(),
+      startDate: Joi.date(),
+      endDate: Joi.date(),
     }),
     params: Joi.object().keys({
       id: Joi.string().required(),
@@ -72,7 +75,7 @@ const updateLeave = {
 
     const leave = await Leave.findById(id);
 
-    if(req.user.role !== 'admin') {
+    if (req.user.role !== 'admin') {
       throw new ApiError(httpStatus.FORBIDDEN, 'You do not have permission to perform this action');
     }
 
@@ -81,6 +84,9 @@ const updateLeave = {
     }
 
     leave.status = status;
+    if (req.body?.startDate) leave.startDate = req.body.startDate;
+    if (req.body?.endDate) leave.endDate = req.body.endDate;
+
     await leave.save();
 
     return res.send({
@@ -95,9 +101,10 @@ const updateLeave = {
 const updateLeaveData = {
   validation: {
     body: Joi.object().keys({
-      date: Joi.date(),
+      startDate: Joi.date(),
+      endDate: Joi.date(),
       reason: Joi.string(),
-      type: Joi.string().valid('full', 'half'),
+      leaveType: Joi.string().valid('full', 'half'),
       halfType: Joi.string().when('type', { is: 'half', then: Joi.valid('first', 'second').required() }),
     }),
     params: Joi.object().keys({
@@ -106,7 +113,7 @@ const updateLeaveData = {
   },
   handler: async (req, res) => {
     const { id } = req.params;
-    const { date } = req.body;
+    const { startDate } = req.body;
 
     const leave = await Leave.findById(id);
 
@@ -118,7 +125,7 @@ const updateLeaveData = {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You can not update leave once it is approved or rejected');
     }
 
-    const isLeaveOld = moment(date).isBefore(moment().startOf('day'));
+    const isLeaveOld = moment(startDate).isBefore(moment().startOf('day'));
 
     if (isLeaveOld) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');

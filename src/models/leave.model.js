@@ -8,7 +8,11 @@ const leaveSchema = mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    date: {
+    startDate : {
+      type: Date,
+      required: true,
+    },
+    endDate : {
       type: Date,
       required: true,
     },
@@ -16,7 +20,7 @@ const leaveSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    type: {
+    leaveType: {
       type: String,
       enum: ['full', 'half'],
     },
