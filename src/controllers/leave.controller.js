@@ -42,7 +42,16 @@ const createLeave = {
 const listLeave = catchAsync(async (req, res) => {
 
   if (req.user.role == 'admin') {
-    const results = await Leave.find().populate('user', 'name email').sort({ createdAt: -1 });
+
+    const { startDate, endDate, status } = req.query;
+
+    const results = await Leave.find(
+      {
+        ...((startDate && endDate) && { startDate: { $gte: new Date(startDate), $lte: new Date(endDate) } }),
+        ...(status && { status: status }),
+      }
+    ).populate('user', 'name email').sort({ createdAt: -1 });
+
     return res.send({
       status: 'success',
       data: results,
@@ -64,6 +73,9 @@ const updateLeave = {
       status: Joi.string().valid('approved', 'rejected').required(),
       startDate: Joi.date(),
       endDate: Joi.date(),
+      leaveType: Joi.string().valid('full', 'half'),
+      halfType: Joi.string().when('type', { is: 'half', then: Joi.valid('first', 'second').required() }),
+      reason: Joi.string(),
     }),
     params: Joi.object().keys({
       id: Joi.string().required(),
@@ -86,6 +98,9 @@ const updateLeave = {
     leave.status = status;
     if (req.body?.startDate) leave.startDate = req.body.startDate;
     if (req.body?.endDate) leave.endDate = req.body.endDate;
+    if (req.body?.leaveType) leave.leaveType = req.body.leaveType;
+    if (req.body?.halfType) leave.halfType = req.body.halfType;
+    if (req.body?.reason) leave.reason = req.body.reason;
 
     await leave.save();
 
