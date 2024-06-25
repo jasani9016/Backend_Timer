@@ -4,6 +4,9 @@ const catchAsync = require('../utils/catchAsync');
 const Joi = require('joi');
 const Leave = require('../models/leave.model');
 const moment = require('moment');
+const { User } = require('../models');
+const cron = require('node-cron');
+
 
 
 const createLeave = {
@@ -95,6 +98,10 @@ const updateLeave = {
       throw new ApiError(httpStatus.NOT_FOUND, 'Leave not found');
     }
 
+    if (leave.status !== 'pending') {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'You can not update leave once it is approved or rejected');
+    }
+
     leave.status = status;
     if (req.body?.startDate) leave.startDate = req.body.startDate;
     if (req.body?.endDate) leave.endDate = req.body.endDate;
@@ -103,6 +110,27 @@ const updateLeave = {
     if (req.body?.reason) leave.reason = req.body.reason;
 
     await leave.save();
+
+    // update leave count in user model
+    if (status === 'approved') {
+      // find days between two dates
+      const startDate = moment(leave.startDate);
+      const endDate = moment(leave.endDate);
+
+      let days = endDate.diff(startDate, 'days') + 1;
+
+      if (days == 1 && leave.leaveType === 'half') {
+        days = 0.5;
+      }
+
+      const user = await User.findById(leave.user);
+      user.leaveCount += days;
+
+      await user.save();
+
+      // add leave days to leave model
+      await Leave.findByIdAndUpdate(id, { leaveDays: days });
+    }
 
     return res.send({
       status: 'success',
@@ -156,6 +184,11 @@ const updateLeaveData = {
   }
 }
 
+
+// every financial year reset leave count to 0
+cron.schedule('0 0 1 4 *', async () => {
+  await User.updateMany({}, { leaveCount: 0 });
+});
 
 
 module.exports = {

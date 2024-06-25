@@ -12,6 +12,4 @@ router.put('/update-status/:id', auth(), validate(leaveController.updateLeave.va
 router.put('/update/:id', auth(), validate(leaveController.updateLeaveData.validation), catchAsync(leaveController.updateLeaveData.handler));
 
 
-
-
 module.exports = router;

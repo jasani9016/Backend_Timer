@@ -28,6 +28,9 @@ const leaveSchema = mongoose.Schema(
       type: String,
       enum: ['first', 'second'],
     },
+    leaveDays: {
+      type: Number
+    },
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],

@@ -51,7 +51,13 @@ const userSchema = mongoose.Schema(
       // },
       private: true, // used by the toJSON plugin
     },
-
+    totalLeave : {
+      type: Number,
+    },
+    leaveCount: {
+      type: Number,
+      default: 0,
+    },
     bankName: {
       type: String,
     },
