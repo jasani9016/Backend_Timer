@@ -111,6 +111,9 @@ const getHolidayList = {
         }
       },
       {
+        $sort: { _id: 1 }
+      },
+      {
         $project: {
           _id: 0,
           month: {
