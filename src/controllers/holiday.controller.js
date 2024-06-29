@@ -91,6 +91,9 @@ const getHolidayList = {
 
     const holidays = await Holiday.aggregate([
       {
+        $sort: { date: 1 }
+      },
+      {
         $project: {
           month: { $month: '$date' },
           name: 1,

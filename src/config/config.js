@@ -24,6 +24,7 @@ const envVarsSchema = Joi.object()
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     FILE_UPLOAD_PATH: Joi.string().description('the path where the files will be uploaded'),
+    BACKEND_URL : Joi.string().description('the backend url')
   })
   .unknown();
 
@@ -45,6 +46,7 @@ module.exports = {
     },
   },
   fileUploadPath: envVars.FILE_UPLOAD_PATH,
+  backendUrl: envVars.BACKEND_URL,
   jwt: {
     secret: envVars.JWT_SECRET,
     accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,

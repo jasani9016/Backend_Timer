@@ -9,6 +9,10 @@ const router = express.Router();
 
 router.post('/create', auth(), validate(leaveController.createLeave.validation), catchAsync(leaveController.createLeave.handler));
 router.get('/list', auth(), leaveController.listLeave);
+
+router.get('/approve-leave', catchAsync(leaveController.approveLeave));
+router.get('/reject-leave', catchAsync(leaveController.rejectLeave));
+
 router.put('/update-status/:id', auth(), validate(leaveController.updateLeave.validation), catchAsync(leaveController.updateLeave.handler));
 router.put('/update/:id', auth(), validate(leaveController.updateLeaveData.validation), catchAsync(leaveController.updateLeaveData.handler));
 

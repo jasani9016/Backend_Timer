@@ -31,6 +31,9 @@ const leaveSchema = mongoose.Schema(
     leaveDays: {
       type: Number
     },
+    emailToken: {
+      type: String,
+    },
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
