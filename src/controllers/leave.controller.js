@@ -6,6 +6,8 @@ const Leave = require('../models/leave.model');
 const moment = require('moment');
 const { User } = require('../models');
 const cron = require('node-cron');
+const config = require('../config/config');
+const { sendLeaveRequestEmail } = require('../services/email.service');
 
 
 
@@ -23,7 +25,8 @@ const createLeave = {
 
     const body = {
       ...req.body,
-      user: req.user.id
+      user: req.user.id,
+      emailToken: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     }
 
     const isLeaveOld = moment(body.startDate).isBefore(moment().startOf('day'));
@@ -34,11 +37,23 @@ const createLeave = {
 
     const result = await new Leave(body).save();
 
-    return res.status(httpStatus.CREATED).send({
+    // populate user details
+    await result.populate('user', 'firstName lastName email').execPopulate();
+
+    res.status(httpStatus.CREATED).send({
       status: 'success',
       message: 'Leave created successfully',
       data: result,
     });
+
+    // send mail to admin
+    return await sendLeaveRequestEmail(
+      config.email.smtp.auth.user,
+      result.emailToken,
+      result
+    )
+
+
   }
 }
 
@@ -69,6 +84,80 @@ const listLeave = catchAsync(async (req, res) => {
   });
 });
 
+
+const approveLeave = catchAsync(async (req, res) => {
+  const { token } = req.query;
+
+  const leave = await Leave.findOne({
+    emailToken: token
+  });
+
+  if (!leave) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Leave not found');
+  }
+
+  if (leave.status !== 'pending') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You can not update leave once it is approved or rejected');
+  }
+
+  leave.status = 'approved';
+
+  await leave.save();
+
+  // update leave count in user model
+  const user = await User.findById(leave.user);
+
+  // find days between two dates
+  const startDate = moment(leave.startDate);
+  const endDate = moment(leave.endDate);
+
+  let days = endDate.diff(startDate, 'days') + 1;
+
+  if (days == 1 && leave.leaveType === 'half') {
+    days = 0.5;
+  }
+
+  user.leaveCount += days;
+
+  await user.save();
+
+  // add leave days to leave model
+  await Leave.findByIdAndUpdate(leave.id, { leaveDays: days });
+
+  return res.send({
+    status: 'success',
+    message: 'Leave approved successfully',
+  });
+
+});
+
+
+const rejectLeave = catchAsync(async (req, res) => {
+
+  const { token } = req.query;
+
+  const leave = await Leave.findOne({
+    emailToken: token
+  });
+
+  if (!leave) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Leave not found');
+  }
+
+  if (leave.status !== 'pending') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'You can not update leave once it is approved or rejected');
+  }
+
+  leave.status = 'rejected';
+
+  await leave.save();
+
+  return res.send({
+    status: 'success',
+    message: 'Leave rejected successfully',
+  });
+
+});
 
 const updateLeave = {
   validation: {
@@ -195,5 +284,7 @@ module.exports = {
   createLeave,
   listLeave,
   updateLeave,
-  updateLeaveData
+  updateLeaveData,
+  approveLeave,
+  rejectLeave
 };
