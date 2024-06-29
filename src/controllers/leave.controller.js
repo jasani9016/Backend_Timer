@@ -53,7 +53,7 @@ const listLeave = catchAsync(async (req, res) => {
         ...((startDate && endDate) && { startDate: { $gte: new Date(startDate), $lte: new Date(endDate) } }),
         ...(status && { status: status }),
       }
-    ).populate('user', 'name email').sort({ createdAt: -1 });
+    ).populate('user', 'firstName lastName email').sort({ createdAt: -1 });
 
     return res.send({
       status: 'success',

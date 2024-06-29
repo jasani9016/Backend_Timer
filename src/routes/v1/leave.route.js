@@ -1,6 +1,7 @@
 const express = require('express');
 const validate = require('../../middlewares/validate');
 const auth = require('../../middlewares/auth');
+
 const catchAsync = require('../../utils/catchAsync');
 const { leaveController } = require('../../controllers');
 
