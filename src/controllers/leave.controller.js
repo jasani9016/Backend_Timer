@@ -9,8 +9,6 @@ const cron = require('node-cron');
 const config = require('../config/config');
 const { sendLeaveRequestEmail } = require('../services/email.service');
 
-
-
 const createLeave = {
   validation: {
     body: Joi.object().keys({
@@ -34,6 +32,12 @@ const createLeave = {
     if (isLeaveOld) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
     }
+
+    // find days between two dates
+    const startDate = moment(body.startDate);
+    const endDate = moment(body.endDate);
+
+    body.leaveDays = endDate.diff(startDate, 'days') + 1;
 
     const result = await new Leave(body).save();
 
@@ -83,6 +87,14 @@ const listLeave = catchAsync(async (req, res) => {
     data: results,
   });
 });
+
+const getListLeaveManagmentById = {
+  handler: async (req, res) => {
+    const { userId } = req.query;
+    const summary = await Leave.find({ user: userId });
+    return res.send(summary);
+  },
+};
 
 
 const approveLeave = catchAsync(async (req, res) => {
@@ -149,14 +161,12 @@ const rejectLeave = catchAsync(async (req, res) => {
   }
 
   leave.status = 'rejected';
-
   await leave.save();
 
   return res.send({
     status: 'success',
     message: 'Leave rejected successfully',
   });
-
 });
 
 const updateLeave = {
@@ -229,7 +239,6 @@ const updateLeave = {
   }
 }
 
-
 const updateLeaveData = {
   validation: {
     body: Joi.object().keys({
@@ -273,16 +282,15 @@ const updateLeaveData = {
   }
 }
 
-
 // every financial year reset leave count to 0
 cron.schedule('0 0 1 4 *', async () => {
   await User.updateMany({}, { leaveCount: 0 });
 });
 
-
 module.exports = {
   createLeave,
   listLeave,
+  getListLeaveManagmentById,
   updateLeave,
   updateLeaveData,
   approveLeave,
