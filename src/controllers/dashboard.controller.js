@@ -1,7 +1,6 @@
 const httpStatus = require('http-status');
 const { Holiday, User } = require('../models');
 
-
 const getDashboard = {
   handler: async (req, res) => {
 
@@ -23,7 +22,7 @@ const getDashboard = {
         $match: {
           month: currentMonth + 1,
           year: currentYear,
-          day: { $gte: currentDay },
+          // day: { $gte: currentDay },
         },
       },
     ]);
@@ -50,7 +49,7 @@ const getDashboard = {
       {
         $match: {
           month: currentMonth + 1,
-          day: { $gte: currentDay },
+          // day: { $gte: currentDay },
         },
       },
     ]);

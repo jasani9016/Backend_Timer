@@ -45,6 +45,16 @@ const getAllUser = {
   }
 }
 
+const getUserById = {
+  handler: async (req, res) => {
+    
+    const { userId } = req.query;
+    const user = await User.find({ user: userId });
+
+    return res.send(user);
+  },
+}
+
 //Profile Update
 
 const updateProfile = {
@@ -142,6 +152,7 @@ const getCompanyDetails = {
   }
 }
 
+//Upcomming birthday
 const upcommingUserBirthdate = {
   handler: async (req, res) => {
     const user = await User.find({ role: 'user' }).sort({ birthDate: 1 });
@@ -152,19 +163,20 @@ const upcommingUserBirthdate = {
   }
 }
 
+//Today birthday
 const todayUserBirthdate = {
   handler: async (req, res) => {
     const user = await User.find({ 
       role: 'user',
       birthDate: {
-        $gte: new Date(new Date().setHours(00, 00, 00)),
-        $lt: new Date(new Date().setHours(23, 59, 59))
+        $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59)
       }
      })
-    return res.status(httpStatus.OK).send({
+     return res.status(httpStatus.OK).send({
       status: 'success',
       data: user
-    });
+    });    
   }
 }
 
@@ -182,7 +194,8 @@ module.exports = {
   updateCompanyDetails,
   getCompanyDetails,
   upcommingUserBirthdate,
-  todayUserBirthdate
+  todayUserBirthdate,
+  getUserById
 };
 
 

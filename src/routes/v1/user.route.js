@@ -14,6 +14,7 @@ router.get('/upcommingUserBirthdate', auth(), userController.upcommingUserBirthd
 // today user birthdate list
 router.get('/todayUserBirthdate', auth(), userController.todayUserBirthdate.handler);
 
+router.get('/getUserById', auth(), catchAsync(userController.getUserById.handler)); 
 router
   .route('/')
   .post(auth('manageUsers'), validate(userValidation.createUser), userController.createUser)

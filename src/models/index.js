@@ -5,3 +5,4 @@ module.exports.Daily = require('./dailySummary.model');
 module.exports.Company = require('./companyDetails.model');
 module.exports.Leave = require('./leave.model');
 module.exports.Holiday = require('./holiday.model');
+module.exports.Rate = require('./rating.model');

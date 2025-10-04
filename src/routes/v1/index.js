@@ -7,6 +7,7 @@ const dailyRoute = require('./daily.route');
 const companyRoute = require('./company.route');
 const holidayRoute = require('./holiday.route');
 const dashboardRoute = require('./dashboard.route');
+const ratingRoute = require('./rating.route');
 
 const router = express.Router();
 
@@ -36,12 +37,16 @@ const defaultRoutes = [
     route: companyRoute,
   },
   {
-    path: '/holiday',
+    path: '/holiday', 
     route: holidayRoute,
   },
   {
     path: '/dashboard',
     route: dashboardRoute,
+  },
+  {
+    path: '/rating',
+    route: ratingRoute,
   }
 ];
 

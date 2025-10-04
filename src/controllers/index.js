@@ -6,3 +6,4 @@ module.exports.dailySummaryController = require('./dailySummary.controller');
 module.exports.companyDetailsController = require('./companyDetails.controller');
 module.exports.holidayController = require('./holiday.controller');
 module.exports.dashboardController = require('./dashboard.controller');
+module.exports.ratingController = require('./rating.controller');

@@ -17,13 +17,13 @@ const register = {
   },
   handler: async (req, res) => {
     // check if email is already registered
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email });    
     if (user) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'User already registered');
     }
 
     // create user
-    const newUser = await new User(req.body).save();
+    const newUser = await new User(req.body).save(); 
     const token = await tokenService.generateAuthTokens(newUser);
     return res.status(httpStatus.CREATED).send({ token, user: newUser });
   }

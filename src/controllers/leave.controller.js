@@ -27,11 +27,11 @@ const createLeave = {
       emailToken: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     }
 
-    const isLeaveOld = moment(body.startDate).isBefore(moment().startOf('day'));
+    // const isLeaveOld = moment(body.startDate).isBefore(moment().startOf('day'));
 
-    if (isLeaveOld) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
-    }
+    // if (isLeaveOld) {
+    //   throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
+    // }
 
     // find days between two dates
     const startDate = moment(body.startDate);
@@ -91,9 +91,17 @@ const listLeave = catchAsync(async (req, res) => {
 const getListLeaveManagmentById = {
   handler: async (req, res) => {
     const { userId } = req.query;
-    const summary = await Leave.find({ user: userId });
+
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1); // January 1st, 00:00:00
+    const endOfYear = new Date(currentYear + 1, 0, 1); // January 1st of next year, 00:00:00
+
+    const summary = await Leave.find({ user: userId, startDate: { $gte: startOfYear, $lt: endOfYear } }).sort({ 
+      startDate: -1  // Sorting in descending order (latest year first)
+    });
     return res.send(summary);
   },
+  
 };
 
 
@@ -266,11 +274,11 @@ const updateLeaveData = {
       throw new ApiError(httpStatus.BAD_REQUEST, 'You can not update leave once it is approved or rejected');
     }
 
-    const isLeaveOld = moment(startDate).isBefore(moment().startOf('day'));
+    // const isLeaveOld = moment(startDate).isBefore(moment().startOf('day'));
 
-    if (isLeaveOld) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
-    }
+    // if (isLeaveOld) {
+    //   throw new ApiError(httpStatus.BAD_REQUEST, 'You can not apply for leave on past dates');
+    // }
 
     const result = await Leave.findByIdAndUpdate(id, req.body, { new: true });
 
